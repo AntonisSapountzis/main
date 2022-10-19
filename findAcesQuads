@@ -1,0 +1,205 @@
+function rnd(min, max) {
+  return Math.floor(Math.random() * ((max + 1) - min)) + min;
+}
+//-------------------------
+function printArray(pin) {
+  let str = '\n';
+  for (let i = 0; i < pin.length; i++) {
+    str += pin[i] + ' | ';
+  }
+  console.log(str + '\n');
+}
+//-------------------------
+function getDashes(cols) {
+  let str = '';
+  for (let i = 0; i < (cols * 4); i++)
+    str += '-';
+  str += '\n';
+  return str;
+}
+//-------------------------
+function printPin(pin /* 2 D array*/) {
+  let cols = pin[0].length, count = pin.length - 1;
+  let str = getDashes(cols) + '| ';
+  for (let row of pin) {
+    for (let col of row) {
+      str += col + ' | ';
+    }
+    count--;
+    str += '\n' + getDashes(cols) + ((count < 0) ? '' : '| ');
+  }
+  console.log(str);
+}
+//-------------------------
+function create2D(rows, cols, value) {  // returns a 2D array rows x cols of default values
+  const pin = [];
+  for (let i = 0; i < rows; i++) {
+    pin[i] = [];
+    for (let j = 0; j < cols; j++) {
+      pin[i][j] = value;
+    }
+  }
+  return pin;
+}
+//-------------------------
+function getDimensions() {
+  let inp, check;
+  do {
+    console.log('Please give me a dimension length (4-12)');
+    inp = Number(prompt(''));
+    check = inp < 4 || inp > 12;
+    if (check) console.log('please try again');
+  } while (check);
+  console.log('Thank you\n');
+  return inp;
+}
+//-------------------------
+function checkAces(pin, half) {
+  let aceCount = 0
+  for (let row of pin) {
+    for (let col of row) {
+      if (col == 1) aceCount++;
+    }
+  }
+  return aceCount == half;
+}
+//-------------------------
+function countAces(pin) {
+  let aceCount = 0
+  for (let row of pin) {
+    for (let col of row) {
+      if (col == 1) aceCount++;
+    }
+  }
+  return aceCount;
+}
+//-------------------------
+function fillRandom(pin, rows, cols) {
+  let half = Math.floor((rows * cols) / 2);
+  do {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        pin[i][j] = rnd(0, 1);
+      }
+    }
+  } while (!checkAces(pin, half));
+  console.log(`Array of ${rows} x ${cols} = (${rows * cols} cells) created with ${countAces(pin)} aces.\n`)
+  return pin;
+}
+//-------------------------
+function countAcesInNewArray(pin) {
+  let count = 0;
+  for (let i = 0; i < pin.length; i++) {
+    if (i < pin.length - 3) {
+      if (pin[i] == 1
+        && pin[i + 1] == 1
+        && pin[i + 2] == 1
+        && pin[i + 3] == 1) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+//-------------------------
+function discover4(pin) {
+  let count = 0, orizontalQuads = 0, verticalQuads = 0;
+  let diagonalUpQuads = 0, diagonalDownLeftQuads = 0, diagonalDownRightQuads = 0, diagonalUpRightQuads = 0;
+  let rows = pin.length, cols = pin[0].length;
+  // check horizontal
+  for (let i = 0; i < rows; i++) {
+    count = 0;
+    for (let j = 0; j < cols; j++) {
+      if (j < cols - 3) {
+        if (pin[i][j] == 1
+          && pin[i][j + 1] == 1
+          && pin[i][j + 2] == 1
+          && pin[i][j + 3] == 1) {
+          orizontalQuads++;
+        }
+      }
+    }
+  }
+
+  // check vertical
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (i < rows - 3) {
+        if (pin[i][j] == 1
+          && pin[i + 1][j] == 1
+          && pin[i + 2][j] == 1
+          && pin[i + 3][j] == 1) {
+          verticalQuads++;
+        }
+      }
+    }
+  }
+  //----------------------- check Upper Left Diagonal
+  const upperLeftDiag = [];
+  let i = 0, j = 0; idx = 0;
+  do {
+    upperLeftDiag[idx] = pin[i][j];
+    idx++; i++; j++;
+  } while (idx < rows);
+
+  diagonalUpQuads = countAcesInNewArray(upperLeftDiag);
+
+  //------------------ check Down left diagonal
+  let k = 0;
+  i = rows - 1, j = 0;
+  const downLeftDiag = [];
+  do {
+    downLeftDiag[k] = pin[i][j];
+    k++; i--; j++;
+  } while (k < rows);
+
+  diagonalDownLeftQuads = countAcesInNewArray(downLeftDiag);
+
+  //--------------------- check Down right diagonal
+  k = 0; j = cols - 1; i = rows - 1;
+  let downRightDiag = [];
+  if (rows != cols) {
+    do {
+      downRightDiag[k] = pin[i][j];
+      k++; i--; j--;
+    } while (k < rows);
+  }
+  diagonalDownRightQuads = countAcesInNewArray(downRightDiag);
+
+  //-------------------------check Up right diagonal
+  k = 0; i = 0, j = cols - 1;
+  let upRightDiag = [];
+  if (rows != cols) {
+    do {
+      upRightDiag[k] = pin[i][j];
+      k++; i++; j--;
+    } while (k < rows);
+  }
+  diagonalUpRightQuads = countAcesInNewArray(upRightDiag);
+
+  console.log(` found ${orizontalQuads + verticalQuads + diagonalUpQuads + diagonalDownLeftQuads + diagonalDownRightQuads + diagonalUpRightQuads} quads`);
+
+  let sumQuads = orizontalQuads + verticalQuads + diagonalUpQuads + diagonalDownLeftQuads + diagonalDownRightQuads + diagonalUpRightQuads
+
+  return sumQuads;
+}
+
+let rows = getDimensions(), cols = getDimensions();
+let pin = [];
+
+//---------------Create 100 2D arrays and Find the  Average of Aces
+let sumQuads = 0;
+let mo = 0;
+for (i = 0; i < 100; i++) {
+  pin = fillRandom(create2D(rows, cols, 0), rows, cols);
+  printPin(pin);
+  sumQuads = sumQuads + discover4(pin);
+}
+mo = sumQuads / 100;
+console.log(`The average quads of aces at 100 arrays is : `, mo);
+
+
+
+
+
+

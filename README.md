@@ -1,4 +1,13 @@
 # main
 
-Creating 2D arrays, finding how many aces there are in Array ( orizontal, vertical, upLeftDiagonal, downLeftDiagonal, upRightDiagonal, downRightDiagonal)
-and calclulating the 
+Creating 2D arrays
+==================
+> Finding how many quads of aces there are in Array 
+    - orizontal, 
+    - vertical, 
+    - upLeftDiagonal, 
+    - downLeftDiagonal, 
+    - upRightDiagonal, 
+    - downRightDiagonal
+    
+> calclulating the average of aces which found , and type them in screen.
